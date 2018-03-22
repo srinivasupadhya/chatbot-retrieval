@@ -10,7 +10,7 @@ def get_id_feature(features, key, len_key, max_len):
 def create_train_op(loss, hparams):
   train_op = tf.contrib.layers.optimize_loss(
       loss=loss,
-      global_step=tf.contrib.framework.get_global_step(),
+      global_step=tf.train.get_global_step(),
       learning_rate=hparams.learning_rate,
       clip_gradients=10.0,
       optimizer=hparams.optimizer)
@@ -82,14 +82,14 @@ def create_model_fn(hparams, model_impl):
           tf.concat(0, all_utterance_lens),
           tf.concat(0, all_targets))
 
-      split_probs = tf.split(0, 10, probs)
-      shaped_probs = tf.concat(1, split_probs)
+      split_probs = tf.split(probs, 10, 0)
+      shaped_probs = tf.concat(split_probs, 1)
 
       # Add summaries
-      tf.histogram_summary("eval_correct_probs_hist", split_probs[0])
-      tf.scalar_summary("eval_correct_probs_average", tf.reduce_mean(split_probs[0]))
-      tf.histogram_summary("eval_incorrect_probs_hist", split_probs[1])
-      tf.scalar_summary("eval_incorrect_probs_average", tf.reduce_mean(split_probs[1]))
+      tf.contrib.deprecated.histogram_summary("eval_correct_probs_hist", split_probs[0])
+      tf.contrib.deprecated.scalar_summary("eval_correct_probs_average", tf.reduce_mean(split_probs[0]))
+      tf.contrib.deprecated.histogram_summary("eval_incorrect_probs_hist", split_probs[1])
+      tf.contrib.deprecated.scalar_summary("eval_incorrect_probs_average", tf.reduce_mean(split_probs[1]))
 
       return shaped_probs, loss, None
 

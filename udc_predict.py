@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
   # Ugly hack, seems to be a bug in Tensorflow
   # estimator.predict doesn't work without this line
-  estimator._targets_info = tf.contrib.learn.estimators.tensor_signature.TensorSignature(tf.constant(0, shape=[1,1]))
+  # estimator._targets_info = tf.contrib.learn.estimators.tensor_signature.TensorSignature(tf.constant(0, shape=[1,1]))
 
   print("Context: {}".format(INPUT_CONTEXT))
   for r in POTENTIAL_RESPONSES:
