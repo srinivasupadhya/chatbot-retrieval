@@ -10,14 +10,17 @@ def get_embeddings(hparams):
     vocab_array, vocab_dict = helpers.load_vocab(hparams.vocab_path)
     glove_vectors, glove_dict = helpers.load_glove_vectors(hparams.glove_path, vocab=set(vocab_array))
     initializer = helpers.build_initial_embedding_matrix(vocab_dict, glove_dict, glove_vectors, hparams.embedding_dim)
+    return tf.get_variable(
+      "word_embeddings",
+      initializer=initializer)
   else:
     tf.logging.info("No glove/vocab path specificed, starting with random embeddings.")
     initializer = tf.random_uniform_initializer(-0.25, 0.25)
 
-  return tf.get_variable(
-    "word_embeddings",
-    shape=[hparams.vocab_size, hparams.embedding_dim],
-    initializer=initializer)
+    return tf.get_variable(
+      "word_embeddings",
+      shape=[hparams.vocab_size, hparams.embedding_dim],
+      initializer=initializer)
 
 
 def dual_encoder_model(
@@ -42,7 +45,7 @@ def dual_encoder_model(
   # Build the RNN
   with tf.variable_scope("rnn") as vs:
     # We use an LSTM Cell
-    cell = tf.nn.rnn_cell.LSTMCell(
+    cell = tf.contrib.rnn.LSTMCell(
         hparams.rnn_dim,
         forget_bias=2.0,
         use_peepholes=True,

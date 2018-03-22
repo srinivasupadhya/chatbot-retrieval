@@ -55,4 +55,4 @@ if __name__ == "__main__":
   print("Context: {}".format(INPUT_CONTEXT))
   for r in POTENTIAL_RESPONSES:
     prob = estimator.predict(input_fn=lambda: get_features(INPUT_CONTEXT, r))
-    print("{}: {:g}".format(r, prob[0,0]))
+    print("{}: {}".format(r, prob.__next__()[0]))
