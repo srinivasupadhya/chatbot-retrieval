@@ -87,10 +87,10 @@ def create_model_fn(hparams, model_impl):
       shaped_probs = tf.concat(split_probs, 1)
 
       # Add summaries
-      tf.contrib.deprecated.histogram_summary("eval_correct_probs_hist", split_probs[0])
-      tf.contrib.deprecated.scalar_summary("eval_correct_probs_average", tf.reduce_mean(split_probs[0]))
-      tf.contrib.deprecated.histogram_summary("eval_incorrect_probs_hist", split_probs[1])
-      tf.contrib.deprecated.scalar_summary("eval_incorrect_probs_average", tf.reduce_mean(split_probs[1]))
+      tf.summary.histogram("eval_correct_probs_hist", split_probs[0])
+      tf.summary.scalar("eval_correct_probs_average", tf.reduce_mean(split_probs[0]))
+      tf.summary.histogram("eval_incorrect_probs_hist", split_probs[1])
+      tf.summary.scalar("eval_incorrect_probs_average", tf.reduce_mean(split_probs[1]))
 
       return shaped_probs, loss, None
 

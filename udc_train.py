@@ -55,6 +55,7 @@ def main(unused_argv):
   
   eval_monitor = tf.contrib.learn.monitors.ValidationMonitor(
         input_fn=input_fn_eval,
+        eval_steps=1,
         every_n_steps=FLAGS.eval_every,
         metrics=eval_metrics)
 
