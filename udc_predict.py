@@ -11,7 +11,7 @@ import udc_inputs
 from models.dual_encoder import dual_encoder_model
 from models.helpers import load_vocab
 
-tf.flags.DEFINE_string("model_dir", None, "Directory to load model checkpoints from")
+tf.flags.DEFINE_string("model_dir", 'runs/test_model', "Directory to load model checkpoints from")
 tf.flags.DEFINE_string("vocab_processor_file", "./data/vocab_processor.bin", "Saved vocabulary processor file")
 FLAGS = tf.flags.FLAGS
 
@@ -27,8 +27,8 @@ vp = tf.contrib.learn.preprocessing.VocabularyProcessor.restore(
   FLAGS.vocab_processor_file)
 
 # Load your own data here
-INPUT_CONTEXT = "Example context"
-POTENTIAL_RESPONSES = ["Response 1", "Response 2"]
+INPUT_CONTEXT = "Is it you?"
+POTENTIAL_RESPONSES = ["Yes", "No", 'I think yes', 'Of course']
 
 def get_features(context, utterance):
   context_matrix = np.array(list(vp.transform([context])))

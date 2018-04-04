@@ -11,7 +11,7 @@ from models.dual_encoder import dual_encoder_model
 tf.flags.DEFINE_string("input_dir", "./data", "Directory containing input data files 'train.tfrecords' and 'validation.tfrecords'")
 tf.flags.DEFINE_string("model_dir", None, "Directory to store model checkpoints (defaults to ./runs)")
 tf.flags.DEFINE_integer("loglevel", 20, "Tensorflow log level")
-tf.flags.DEFINE_integer("num_epochs", None, "Number of training Epochs. Defaults to indefinite.")
+tf.flags.DEFINE_integer("num_epochs", 100, "Number of training Epochs. Defaults to indefinite.")
 tf.flags.DEFINE_integer("eval_every", 2000, "Evaluate after this many train steps")
 FLAGS = tf.flags.FLAGS
 
@@ -55,7 +55,6 @@ def main(unused_argv):
   
   eval_monitor = tf.contrib.learn.monitors.ValidationMonitor(
         input_fn=input_fn_eval,
-        eval_steps=1,
         every_n_steps=FLAGS.eval_every,
         metrics=eval_metrics)
 
