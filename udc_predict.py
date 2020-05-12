@@ -27,8 +27,10 @@ vp = tf.contrib.learn.preprocessing.VocabularyProcessor.restore(
   FLAGS.vocab_processor_file)
 
 # Load your own data here
-INPUT_CONTEXT = "Is it you?"
-POTENTIAL_RESPONSES = ["Yes", "No", 'I think yes', 'Of course']
+INPUT_CONTEXT = "my monitor is not working"
+POTENTIAL_RESPONSES = ["Welcome Is there anything else I could help you with", "What is your OS version",
+                       "Good Morning What is the problem you are facing", "Looking into the issue",
+                       "Hi How can I help you today", "what is the model number", "have you tried upgrading the driver"]
 
 def get_features(context, utterance):
   context_matrix = np.array(list(vp.transform([context])))

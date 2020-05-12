@@ -5,7 +5,7 @@ from collections import defaultdict
 
 def load_vocab(filename):
   vocab = None
-  with open(filename) as f:
+  with open(filename, "r", encoding="utf-8") as f:
     vocab = f.read().splitlines()
   dct = defaultdict(int)
   for idx, word in enumerate(vocab):

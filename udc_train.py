@@ -15,6 +15,7 @@ tf.flags.DEFINE_integer("num_epochs", 100, "Number of training Epochs. Defaults 
 tf.flags.DEFINE_integer("eval_every", 2000, "Evaluate after this many train steps")
 FLAGS = tf.flags.FLAGS
 
+INPUT_FEATURE_SIZE = 160
 TIMESTAMP = int(time.time())
 
 if FLAGS.model_dir:
@@ -26,6 +27,15 @@ TRAIN_FILE = os.path.abspath(os.path.join(FLAGS.input_dir, "train.tfrecords"))
 VALIDATION_FILE = os.path.abspath(os.path.join(FLAGS.input_dir, "validation.tfrecords"))
 
 tf.logging.set_verbosity(FLAGS.loglevel)
+
+def serving_input_fn():
+  features = {
+    "context": tf.placeholder(dtype=tf.int64, shape=[1, INPUT_FEATURE_SIZE]),
+    "context_len": tf.placeholder(dtype=tf.int64, shape=[1, 1]),
+    "utterance": tf.placeholder(dtype=tf.int64, shape=[1, INPUT_FEATURE_SIZE]),
+    "utterance_len": tf.placeholder(dtype=tf.int64, shape=[1, 1]),
+  }
+  return tf.contrib.learn.InputFnOps(features, None, features)
 
 def main(unused_argv):
   hparams = udc_hparams.create_hparams()
@@ -59,6 +69,9 @@ def main(unused_argv):
         metrics=eval_metrics)
 
   estimator.fit(input_fn=input_fn_train, steps=None, monitors=[eval_monitor])
+
+  estimator_base_path = os.path.abspath(os.path.join("./saved_model", str(TIMESTAMP)))
+  estimator.export_savedmodel(estimator_base_path, serving_input_fn)
 
 if __name__ == "__main__":
   tf.app.run()
