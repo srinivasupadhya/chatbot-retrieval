@@ -1,0 +1,103 @@
+<html>
+<head>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.15.3/dist/tf.min.js"></script>
+<script type="text/javascript">
+var model;
+var vocab;
+var suggestions = ["Welcome Is there anything else I could help you with", "What is your OS version", "Good Morning What is the problem you are facing", "Looking into the issue", "Hi How can I help you today", "what is the model number", "have you tried upgrading the driver"];
+var transformed_suggestions = [];
+
+function transform(text)
+{
+	result = {};
+	transformed = new Array(160).fill(0);
+	words = text.toLowerCase().split(" ");
+	max = words.length > 160 ? 160 : words.length;
+	for(i = 0; i < max; i++)
+	{
+		if(vocab[words[i]])
+		{
+			transformed[i] = vocab[words[i]];
+		}
+	}
+	result['text'] = text;
+	result['vector'] = transformed;
+	result['length'] = max;
+	return result;
+}
+
+async function onLoad() {
+	setMsg('loading model');
+	model = await tf.loadGraphModel('https://srupadhyblobstore.blob.core.windows.net/1590316391js/tensorflowjs_model.pb');
+	setMsg('model loaded');
+
+	setMsg('loading vocab');
+	response = await fetch("https://srupadhyblobstore.blob.core.windows.net/1590316391js/vocabulary.json");
+	vocab = await response.json();
+	setMsg('vocab loaded. value of the: ' + vocab['the']);
+
+	for(j = 0; j < suggestions.length; j++)
+	{
+		transformed_suggestions.push(transform(suggestions[j]));
+	}
+}
+
+async function onClick() {
+	input_text = document.getElementById('input-text').value;
+	setMsg(input_text);
+
+	transformed_input = transform(input_text);
+
+	output_text = '';
+
+	for(k = 0; k < transformed_suggestions.length; k++)
+	{
+		
+		context = new Array();
+		context.push(transformed_input['vector']);
+
+		context_len = new Array();
+		context_len_val = new Array();
+		context_len_val.push(transformed_input['length']);
+		context_len.push(context_len_val);
+
+		utterance = new Array();
+		utterance.push(transformed_suggestions[k]['vector']);
+
+		utterance_len = new Array();
+		utterance_len_val = new Array();
+		utterance_len_val.push(transformed_suggestions[k]['length']);
+		utterance_len.push(utterance_len_val);
+	
+		tf_context = tf.tensor2d(context, null, 'int32');
+		tf_context_len = tf.tensor2d(context_len, null, 'int32');
+		tf_utterance = tf.tensor2d(utterance, null, 'int32');
+		tf_utterance_len = tf.tensor2d(utterance_len, null, 'int32');
+
+		input = {};
+		input['Placeholder'] = tf_context;
+		input['Placeholder_1'] = tf_context_len;
+		input['Placeholder_2'] = tf_utterance;
+		input['Placeholder_3'] = tf_utterance_len;
+
+		result = await model.executeAsync(input);
+
+		output_text += transformed_suggestions[k]['text'] + ' ' + result.dataSync()[0] + "\n";
+	}
+
+	setMsg(output_text);
+}
+
+function setMsg(text) {
+	document.getElementById('suggestion').innerHTML = '<pre>' + text + '</pre>';
+}
+</script>
+</head>
+<body onload="onLoad()">
+<input type="text" id="input-text" />
+<input type="button" value="suggest" onclick="onClick()" />
+
+<div id="suggestion">
+</div>
+</body>
+</html>
