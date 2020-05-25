@@ -4,7 +4,7 @@
 <script type="text/javascript">
 var model;
 var vocab;
-var suggestions = ["Welcome Is there anything else I could help you with", "What is your OS version", "Good Morning What is the problem you are facing", "Looking into the issue", "Hi How can I help you today", "what is the model number", "have you tried upgrading the driver"];
+var suggestions = ["Welcome Is there anything else I could help you with", "What is your OS version", "Good Morning How can I help you today", "Looking into the issue", "What is the model number", "Have you tried upgrading the driver", "Hi How are you doing today"];
 var transformed_suggestions = [];
 
 function transform(text)
@@ -48,7 +48,7 @@ async function onClick() {
 
 	transformed_input = transform(input_text);
 
-	output_text = '';
+	scores = [];
 
 	for(k = 0; k < transformed_suggestions.length; k++)
 	{
@@ -82,9 +82,16 @@ async function onClick() {
 
 		result = await model.executeAsync(input);
 
-		output_text += transformed_suggestions[k]['text'] + ' ' + result.dataSync()[0] + "\n";
+		scores.push({'text': transformed_suggestions[k]['text'], 'score': result.dataSync()[0]});
 	}
 
+	scores.sort((a, b) => (a.score > b.score) ? 1 : ((b.score > a.score) ? -1 : 0));
+
+	output_text = '';
+	for(l = 0; l < scores.length; l++)
+	{
+		output_text += scores[l]['text'] + ' ' + scores[l]['score'] + "\n";
+	}
 	setMsg(output_text);
 }
 
